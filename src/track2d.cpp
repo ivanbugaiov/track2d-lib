@@ -1,14 +1,14 @@
 #include "../include/track2d.hpp"
-#include "include/instant_linear_estimator.hpp"
+#include "include/linear_estimator.hpp"
 
 #include <list>
 
 namespace track2d {
 
-TrackEstimator::TrackEstimator(std::shared_ptr<IPlotSource> track_provider, EstimationModel estimation_model) {
+TrackEstimator::TrackEstimator(std::shared_ptr<IPlotSource> track_provider, Model estimation_model) {
     switch (estimation_model) {
-        case EstimationModel::linear:
-            m_impl = std::unique_ptr<ITrackEstimator>(new InstantLinearEstimator(track_provider));
+        case Model::linear:
+            m_impl = std::unique_ptr<ITrackEstimator>(new LinearEstimator(track_provider));
     }
     
 } // TrackEstimator
@@ -16,7 +16,7 @@ TrackEstimator::TrackEstimator(std::shared_ptr<IPlotSource> track_provider, Esti
 TrackEstimator::~TrackEstimator() {
 } // ~TrackEstimator
 
-std::optional<EstimationResult> TrackEstimator::get_expected_crossing(std::shared_ptr<IPerimeter> perimeter) {
+std::optional<ITrackEstimator::Result> TrackEstimator::get_expected_crossing(std::shared_ptr<IPerimeter> perimeter) {
     return m_impl->get_expected_crossing(perimeter);
 } // get_expected_crossing
 

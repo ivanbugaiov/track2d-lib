@@ -12,20 +12,19 @@ namespace track2d {
 using custom_time_t = uint64_t;
     
 struct point2d_t { 
-    double x; 
-    double y; 
+    double x = 0.0;
+    double y = 0.0;
 }; // point2d_t
 
 using vector2d_t = point2d_t;
 
 struct Plot {
-    custom_time_t time;
+    custom_time_t time = 0;
     point2d_t loc;
 }; // Plot
     
 class IPlotSource {
 public:
-    IPlotSource() {}
     virtual ~IPlotSource() {}
     virtual std::optional<Plot> get() = 0;
     virtual bool advance() = 0;
@@ -44,29 +43,31 @@ struct Target {
 double get_target_speed(const Target& target);
 double get_target_angle(const Target& target);
 
-struct EstimationResult {
-    Plot expected_crossing_plot;
-    vector2d_t expected_crossing_sped;
-    double accuracy;
-}; // EstimationResult
-
 class ITrackEstimator {   
 public:
-    ITrackEstimator() {}
+    struct Result {
+        Plot plot;
+        vector2d_t speed;
+        double accuracy;
+    }; // Result
+
+public:
     virtual ~ITrackEstimator() {}
-    virtual std::optional<EstimationResult> get_expected_crossing(std::shared_ptr<IPerimeter> perimeter) = 0;
+    virtual std::optional<Result> get_expected_crossing(std::shared_ptr<IPerimeter> perimeter) = 0;
     virtual bool advance() = 0;
 }; // ITrackEstimator
 
-enum class EstimationModel { 
-    linear
-}; // EstimationModel
 
 class TrackEstimator : public ITrackEstimator {
 public:
-    TrackEstimator(std::shared_ptr<IPlotSource> track_provider, EstimationModel estimation_model);
+    enum class Model {
+        linear
+    }; // Model
+
+public:
+    TrackEstimator(std::shared_ptr<IPlotSource> track_provider, Model estimation_model);
     ~TrackEstimator() final override;
-    std::optional<EstimationResult> get_expected_crossing(std::shared_ptr<IPerimeter> perimeter) final override;
+    std::optional<Result> get_expected_crossing(std::shared_ptr<IPerimeter> perimeter) final override;
     bool advance() final override;
 protected:
     TrackEstimator(std::shared_ptr<IPlotSource> track_provider);
