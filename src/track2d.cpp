@@ -16,8 +16,9 @@ TrackEstimator::TrackEstimator(std::shared_ptr<IPlotSource> track_provider, Mode
 TrackEstimator::~TrackEstimator() {
 } // ~TrackEstimator
 
-std::optional<ITrackEstimator::Result> TrackEstimator::get_expected_crossing(std::shared_ptr<IPerimeter> perimeter) {
-    return m_impl->get_expected_crossing(perimeter);
+std::optional<ITrackEstimator::Result> TrackEstimator::get_expected_crossing(std::shared_ptr<IPerimeter> perimeter,
+                                                                             custom_time_t look_ahead_interval) {
+    return m_impl->get_expected_crossing(perimeter, look_ahead_interval);
 } // get_expected_crossing
 
 bool TrackEstimator::advance() {

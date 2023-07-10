@@ -7,9 +7,8 @@
 
 namespace track2d {
     
-// time.h is not part of the standard library 
-// custom type for storing time had to be made
-using custom_time_t = uint64_t;
+// sample data from task description hints at floating point time
+using custom_time_t = double;
     
 struct point2d_t { 
     double x = 0.0;
@@ -53,7 +52,8 @@ public:
 
 public:
     virtual ~ITrackEstimator() {}
-    virtual std::optional<Result> get_expected_crossing(std::shared_ptr<IPerimeter> perimeter) = 0;
+    virtual std::optional<Result> get_expected_crossing(std::shared_ptr<IPerimeter> perimeter,
+                                                        custom_time_t look_ahead_interval) = 0;
     virtual bool advance() = 0;
 }; // ITrackEstimator
 
@@ -67,7 +67,8 @@ public:
 public:
     TrackEstimator(std::shared_ptr<IPlotSource> track_provider, Model estimation_model);
     ~TrackEstimator() final override;
-    std::optional<Result> get_expected_crossing(std::shared_ptr<IPerimeter> perimeter) final override;
+    std::optional<Result> get_expected_crossing(std::shared_ptr<IPerimeter> perimeter,
+                                                custom_time_t look_ahead_interval) final override;
     bool advance() final override;
 protected:
     TrackEstimator(std::shared_ptr<IPlotSource> track_provider);

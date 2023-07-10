@@ -10,7 +10,8 @@ LinearEstimator::~LinearEstimator() {
     
 } // ~TrackEstimatorImpl
 
-std::optional<ITrackEstimator::Result> LinearEstimator::get_expected_crossing(std::shared_ptr<IPerimeter> perimeter) {
+std::optional<ITrackEstimator::Result> LinearEstimator::get_expected_crossing(std::shared_ptr<IPerimeter> perimeter,
+                                                                              custom_time_t look_ahead_interval) {
     return std::nullopt;
 } // get_expected_crossing
     
