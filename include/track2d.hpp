@@ -1,25 +1,22 @@
 #ifndef TRACK2D_HPP
 #define TRACK2D_HPP
 
+#include "vector2d.hpp"
+
 #include <cstdint>
 #include <memory>
 #include <optional>
+#include <functional>
 
 namespace track2d {
     
 // sample data from task description hints at floating point time
 using custom_time_t = double;
-    
-struct point2d_t { 
-    double x = 0.0;
-    double y = 0.0;
-}; // point2d_t
-
-using vector2d_t = point2d_t;
+using Vector2D = vector2d_t<double>;
 
 struct Plot {
     custom_time_t time = 0;
-    point2d_t loc;
+    Vector2D loc;
 }; // Plot
     
 class IPlotSource {
@@ -31,44 +28,51 @@ public:
     
 class IPerimeter {
 public:
-    virtual bool is_point_inside(const point2d_t& pt) = 0;
+    virtual std::optional<track2d::Vector2D> get_crossing_point(const track2d::Vector2D& approach_point,
+                                                                 const track2d::Vector2D& unknown_point) = 0;
 }; // IPerimeter
 
 struct Target {
-    point2d_t current_location;
-    vector2d_t current_speed;
+    Vector2D location;
+    double speed;
+    double angle;
 }; // Traget
-
-double get_target_speed(const Target& target);
-double get_target_angle(const Target& target);
 
 class ITrackEstimator {   
 public:
     struct Result {
         Plot plot;
-        vector2d_t speed;
-        double accuracy;
+        double speed;
+        double angle;
     }; // Result
 
 public:
     virtual ~ITrackEstimator() {}
-    virtual std::optional<Result> get_expected_crossing(std::shared_ptr<IPerimeter> perimeter,
-                                                        custom_time_t look_ahead_interval) = 0;
+    virtual std::optional<Result> get_expected_crossing(std::shared_ptr<IPerimeter> perimeter) = 0;
     virtual bool advance() = 0;
 }; // ITrackEstimator
 
+struct TrackDisplayMessage {
+    enum class PlotType { source, estimate, collision };
+    Plot plot;
+    PlotType plot_type;
+    double estimation_accuracy;
+}; // TrackDisplayMessage
+
+using TrackDisplayCallback = std::function<void(const TrackDisplayMessage&)>;
 
 class TrackEstimator : public ITrackEstimator {
 public:
     enum class Model {
-        linear
+        global_average
     }; // Model
-
+    
 public:
-    TrackEstimator(std::shared_ptr<IPlotSource> track_provider, Model estimation_model);
+    TrackEstimator(std::shared_ptr<IPlotSource> track_provider, 
+                   Model estimation_model, 
+                   TrackDisplayCallback display_cb);
     ~TrackEstimator() final override;
-    std::optional<Result> get_expected_crossing(std::shared_ptr<IPerimeter> perimeter,
-                                                custom_time_t look_ahead_interval) final override;
+    std::optional<Result> get_expected_crossing(std::shared_ptr<IPerimeter> perimeter) final override;
     bool advance() final override;
 protected:
     TrackEstimator(std::shared_ptr<IPlotSource> track_provider);

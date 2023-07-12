@@ -20,9 +20,9 @@ endif()
 
 add_library(track2d SHARED
     include/track2d.hpp
-    src/include/linear_estimator.hpp
-
+    src/include/global_average_estimator.hpp
     src/track2d.cpp
-    src/linear_estimator.cpp
+    src/statistics.cpp
+    src/global_average_estimator.cpp
 )
 

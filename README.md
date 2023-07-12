@@ -38,7 +38,7 @@ public:
 ```cpp
 class IPerimeter {
 public:
-    virtual bool is_point_inside(const point2d_t& pt) = 0;
+    virtual bool is_point_inside(const Vector2D& pt) = 0;
 }; // IPerimeter
 ```
 
